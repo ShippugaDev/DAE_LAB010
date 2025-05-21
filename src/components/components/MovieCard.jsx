@@ -1,37 +1,58 @@
+import { useState } from "react";
 import Rating from "../widgets/Rating";
+import Button from "../widgets/Button";
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, isFavorite = false, onToggleFavorite }) => {
   const { title, rating, genre, duration, image, description, showTimes } = movie;
+  const [animating, setAnimating] = useState(false);
+
+  const handleFavoriteClick = () => {
+    if (animating) return; // prevent spam clicks
+    setAnimating(true);
+    onToggleFavorite(movie.id);
+    setTimeout(() => setAnimating(false), 500); // animation duration
+  };
 
   return (
-    <article className="card d-flex f-direction-column">
-      <div className="p-relative">
+    <article className="card card--movie">
+      <div className="card__header p-relative">
         <img
           src={image}
           alt={`${title} poster`}
           className="card__image"
           loading="lazy"
         />
-        <span className="badge badge--primary interactive p-absolute t-2 r-2 f-weight-700">{genre}</span>
+        <span className="badge badge--primary p-absolute t-2 r-2">{genre}</span>
+
+        <button
+          aria-label={isFavorite ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
+          onClick={handleFavoriteClick}
+          className={`favorite-button p-absolute t-2 l-2 ${animating ? "animate" : ""}`}
+        >
+          {isFavorite ? "❤️" : "🤍"}
+        </button>
       </div>
-      <div className="card__body f-1 g-2">
-        <h3 className="title title--2xs">{title}</h3>
+
+      <div className="card__body d-flex f-direction-column g-2">
+        <h3 className="card__title">{title}</h3>
         <div className="d-flex a-items-center g-2">
           <Rating value={rating} />
-          <span className="interactive c-secondary">{duration}</span>
+          <span className="card__duration">{duration}</span>
         </div>
-        <p className="text text--sm c-shadow">{description.slice(0, 256)}...</p>
-        <div className="d-flex f-direction-column g-2 m-top-auto">
-          <h4 className="interactive interactive--lg c-primary">Today's Showtimes</h4>
+        <p className="card__description">
+          {description.length > 150 ? description.slice(0, 147) + "..." : description}
+        </p>
+
+        <div className="card__showtimes">
+          <h4 className="card__subtitle">Today's Showtimes</h4>
           <div className="d-flex f-wrap g-2">
-            {showTimes.map((time, index) => (
-              <button
-                key={index}
-                className="button button--outline-primary interactive interactive--sm"
-                aria-label={`Show time ${time} for ${title}`}
-              >
-                {time}
-              </button>
+            {showTimes.map((time, i) => (
+              <Button
+                key={i}
+                text={time}
+                variant="outline-primary"
+                ariaLabel={`Showtime ${time} for ${title}`}
+              />
             ))}
           </div>
         </div>

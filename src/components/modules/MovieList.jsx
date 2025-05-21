@@ -1,13 +1,17 @@
 import MovieCard from "../components/MovieCard";
 
-const MovieList = ({ movies }) => {
+const MovieList = ({ movies, favorites = {}, onToggleFavorite }) => {
   return (
-    <section id="movies" className="section">
-      <div className="container d-flex f-direction-column g-8">
-        <h2 className="title c-primary t-align-center">Now Showing</h2>
-        <div className="g-layout g-layout--auto-fit-columns g-8">
-          {movies.map(movie => (
-            <MovieCard key={movie.id} movie={movie} />
+    <section className="section section--movies">
+      <div className="container">
+        <div className="g-layout g-layout--auto-fit-columns g-6">
+          {movies.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              movie={movie}
+              isFavorite={!!favorites[movie.id]}
+              onToggleFavorite={() => onToggleFavorite(movie.id)}
+            />
           ))}
         </div>
       </div>
