@@ -4,7 +4,15 @@ const MovieList = ({ movies, favorites = {}, onToggleFavorite }) => {
   return (
     <section className="section section--movies">
       <div className="container">
-        <div className="g-layout g-layout--auto-fit-columns g-6">
+        <div
+          className="movie-cards-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "2.5rem",
+            justifyItems: "center"
+          }}
+        >
           {movies.map((movie) => (
             <MovieCard
               key={movie.id}
