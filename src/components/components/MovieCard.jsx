@@ -100,7 +100,7 @@ const MovieCard = ({ movie, isFavorite = false, onToggleFavorite }) => {
               transition: "transform 0.25s cubic-bezier(.4,2,.3,1)"
             }}
           >
-            {isFavorite ? "💙" : "🤍"}
+            {isFavorite ? "♥️" : "🤍"}
           </span>
         </button>
       </div>

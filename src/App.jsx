@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/layouts/Header";
 import Hero from "./components/modules/Hero";
 import MovieList from "./components/modules/MovieList";
@@ -8,8 +8,17 @@ import { getMovies } from "./utils/movie.utils";
 
 function App() {
   const movies = getMovies();
-  const [favorites, setFavorites] = useState({});
+  // Leer favoritos de localStorage al iniciar
+  const [favorites, setFavorites] = useState(() => {
+    const stored = localStorage.getItem("favorites");
+    return stored ? JSON.parse(stored) : {};
+  });
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Guardar favoritos en localStorage cuando cambian
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
 
   const toggleFavorite = (movieId) => {
     setFavorites((prev) => ({
