@@ -9,7 +9,7 @@ const MovieCard = ({ movie, isFavorite = false, onToggleFavorite }) => {
   const handleFavoriteClick = () => {
     if (animating) return; // prevent spam clicks
     setAnimating(true);
-    onToggleFavorite(movie.id);
+    onToggleFavorite(movie);
     setTimeout(() => setAnimating(false), 500); // animation duration
   };
 

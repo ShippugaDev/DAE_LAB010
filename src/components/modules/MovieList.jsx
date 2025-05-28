@@ -1,6 +1,6 @@
 import MovieCard from "../components/MovieCard";
 
-const MovieList = ({ movies, favorites = {}, onToggleFavorite }) => {
+const MovieList = ({ movies, favorites = [], onToggleFavorite }) => {
   return (
     <section className="section section--movies">
       <div className="container">
@@ -17,8 +17,8 @@ const MovieList = ({ movies, favorites = {}, onToggleFavorite }) => {
             <MovieCard
               key={movie.id}
               movie={movie}
-              isFavorite={!!favorites[movie.id]}
-              onToggleFavorite={() => onToggleFavorite(movie.id)}
+              isFavorite={favorites.some(f => f.id === movie.id)}
+              onToggleFavorite={() => onToggleFavorite(movie)}
             />
           ))}
         </div>

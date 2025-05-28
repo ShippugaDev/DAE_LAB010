@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { movies } from "../data/movies.data";
+import { getMovies } from "../utils/movie.utils";
 
 export function usePremieres(delay = 500) {
   const [premieres, setPremieres] = useState([]);
@@ -11,7 +11,7 @@ export function usePremieres(delay = 500) {
     setLoading(true);
     timerRef.current = setTimeout(() => {
       try {
-        setPremieres(movies.slice(0, 10)); // primeros 10 estrenos
+        setPremieres(getMovies().slice(0, 10)); // primeros 10 estrenos
       } catch (e) {
         setError(e);
       } finally {

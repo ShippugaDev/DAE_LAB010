@@ -1,58 +1,89 @@
 import { useState } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { usePremieres } from "./hooks/usePremieres";
 import Header from "./components/layouts/Header";
 import Hero from "./components/modules/Hero";
+import PremieresSlider from "./components/modules/PremieresSlider";
 import MovieList from "./components/modules/MovieList";
-import MovieSearch from "./components/widgets/MovieSearch";
 import Footer from "./components/layouts/Footer";
 import { getMovies } from "./utils/movie.utils";
 import useLocalStorage from "./hooks/useLocalStorage";
+import { useDebounce } from "./hooks/useDebounce";
+import LoadingSkeleton from "./components/widgets/LoadingSkeleton";
+import MovieSearch from "./components/components/MovieSearch";
+
+const FAVORITE_KEY = "sin-e-favorites";
 
 function App() {
-  const movies = getMovies();
-  // Usar useLocalStorage para favoritos
-  const [favorites, setFavorites] = useLocalStorage("favorites", {});
-  const [searchQuery, setSearchQuery] = useState("");
+  const [movies] = useState(getMovies());
+  // Usa useLocalStorage para persistencia de favoritos
+  const [favorites, setFavorites] = useLocalStorage(FAVORITE_KEY, []);
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedQuery = useDebounce(searchTerm, 300);
 
-  const toggleFavorite = (movieId) => {
-    setFavorites((prev) => ({
-      ...prev,
-      [movieId]: !prev[movieId],
-    }));
+  const { premieres, loading: loadingPremieres } = usePremieres();
+
+  // Permite agregar y quitar favoritos (array de películas)
+  const handleToggleFavorite = (movie) => {
+    setFavorites((prev) => {
+      const exists = prev.some((f) => f.id === movie.id);
+      const updated = exists
+        ? prev.filter((f) => f.id !== movie.id)
+        : [...prev, movie];
+      return updated;
+    });
   };
 
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-  };
-
-  const filteredMovies = movies.filter((movie) =>
-    movie.title.toLowerCase().includes(searchQuery)
+  // Filtra películas por búsqueda
+  const filteredMovies = movies.filter((m) =>
+    m.title.toLowerCase().includes(debouncedQuery.toLowerCase())
   );
-
-  const favoriteMovies = movies.filter((movie) => favorites[movie.id]);
 
   return (
     <>
       <Header />
       <main className="main d-flex f-direction-column g-8">
-        <Hero />
-        <MovieSearch onSearch={handleSearch} />
+        <Hero handleEvent={setSearchTerm} />
+        {/* Sección de estrenos */}
+        <section className="section section--premieres">
+          <h2 className="title c-primary t-align-center">Estrenos</h2>
+          {loadingPremieres ? (
+            <LoadingSkeleton count={4} height={230} />
+          ) : (
+            <PremieresSlider
+              items={premieres}
+              loading={false}
+              onSelect={() => {}}
+            />
+          )}
+        </section>
+        {/* Barra de búsqueda */}
+        <MovieSearch onSearch={setSearchTerm} />
         <MovieList
+          id="now-showing"
+          title="Now Showing 🎬"
           movies={filteredMovies}
           favorites={favorites}
-          onToggleFavorite={toggleFavorite}
+          onToggleFavorite={handleToggleFavorite}
         />
-        {favoriteMovies.length > 0 && (
+        {favorites.length > 0 && (
           <>
-            <h2 className="title c-primary t-align-center m-top-8">Your Favorites ❤️</h2>
+            <h2 className="title c-primary t-align-center m-top-8">
+              Mis favoritos ❤️
+            </h2>
             <MovieList
-              movies={favoriteMovies}
+              id="favorites"
+              title=""
+              movies={favorites}
               favorites={favorites}
-              onToggleFavorite={toggleFavorite}
+              onToggleFavorite={handleToggleFavorite}
             />
           </>
         )}
       </main>
       <Footer />
+      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }
