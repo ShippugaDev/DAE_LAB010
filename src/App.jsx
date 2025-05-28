@@ -12,6 +12,7 @@ import useLocalStorage from "./hooks/useLocalStorage";
 import { useDebounce } from "./hooks/useDebounce";
 import LoadingSkeleton from "./components/widgets/LoadingSkeleton";
 import MovieSearch from "./components/components/MovieSearch";
+import { notifyFavorite } from "./utils/notifyFavorite";
 
 const FAVORITE_KEY = "sin-e-favorites";
 
@@ -26,13 +27,12 @@ function App() {
 
   // Permite agregar y quitar favoritos (array de películas)
   const handleToggleFavorite = (movie) => {
-    setFavorites((prev) => {
-      const exists = prev.some((f) => f.id === movie.id);
-      const updated = exists
-        ? prev.filter((f) => f.id !== movie.id)
-        : [...prev, movie];
-      return updated;
-    });
+    const exists = favorites.some((f) => f.id === movie.id);
+    const updated = exists
+      ? favorites.filter((f) => f.id !== movie.id)
+      : [...favorites, movie];
+    setFavorites(updated);
+    notifyFavorite(movie, !exists);
   };
 
   // Filtra películas por búsqueda
